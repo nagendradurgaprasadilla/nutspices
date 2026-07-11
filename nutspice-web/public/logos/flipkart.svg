@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <!-- Flipkart Logo: Shopping Bag Icon + Text -->
+  <g transform="translate(10, 5)">
+    <!-- Shopping Bag Icon -->
+    <g transform="translate(0, 5)">
+      <!-- Handle -->
+      <path d="M12,10 C12,4 24,4 24,10" fill="none" stroke="#FFE11B" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Body -->
+      <rect x="5" y="10" width="26" height="26" rx="5" fill="#FFE11B"/>
+      <!-- Smile / fast-forward curves -->
+      <path d="M11,18 L16,23 L11,28" fill="none" stroke="#2874F0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M17,18 L22,23 M22,23 L17,28" fill="none" stroke="#2874F0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Text "Flipkart" -->
+    <text x="42" y="32" font-family="'Outfit', 'Inter', sans-serif" font-weight="900" font-size="25" fill="#2874F0" font-style="italic" letter-spacing="-0.5">Flipkart</text>
+    <text x="138" y="32" font-family="'Outfit', 'Inter', sans-serif" font-weight="900" font-size="12" fill="#FFE11B" font-style="italic">plus</text>
+  </g>
+</svg>

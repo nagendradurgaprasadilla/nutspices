@@ -5,6 +5,7 @@ import { Sparkles, ChevronDown } from "lucide-react";
 import ProductGrid from "@/components/ProductGrid";
 import BannerCarousel from "@/components/BannerCarousel";
 import HomeTabs from "@/components/HomeTabs";
+import MarketplaceTrustBar from "@/components/storefront/MarketplaceTrustBar";
 import { db } from "@/db";
 import { products, productVariations, pageSections, homeCategoryBanners, homeTabs } from "@/db/schema";
 import { eq, sql, inArray } from "drizzle-orm";
@@ -121,6 +122,7 @@ export default async function Home() {
           <p className="text-white/80 text-lg md:text-xl max-w-4xl mx-auto mb-4 font-inter leading-relaxed">
             Premium dry fruits and hand-roasted nuts, delivered directly to your doorstep.
           </p>
+          <MarketplaceTrustBar />
         </div>
         
         <Link 

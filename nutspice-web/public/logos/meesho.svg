@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <!-- Meesho Logo: Monogram M + Text -->
+  <g transform="translate(10, 5)">
+    <!-- Monogram M -->
+    <g transform="translate(5, 5)">
+      <!-- Left leg/arch (Jamuni / Purple) -->
+      <path d="M5,26 C5,10 16,5 23,5 C28,5 31,10 31,17 L31,30" fill="none" stroke="#9F2089" stroke-width="7.5" stroke-linecap="round"/>
+      <!-- Right leg/arch (Aam / Peach-Orange) -->
+      <path d="M18,30 L18,17 C18,10 21,5 26,5 C33,5 44,10 44,30" fill="none" stroke="#F15A24" stroke-width="7.5" stroke-linecap="round"/>
+    </g>
+    <!-- Text "meesho" -->
+    <text x="60" y="31" font-family="'Outfit', 'Inter', sans-serif" font-weight="800" font-size="26" fill="#333333" letter-spacing="-0.5">meesho</text>
+  </g>
+</svg>
