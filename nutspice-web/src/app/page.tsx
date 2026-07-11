@@ -23,10 +23,10 @@ async function getFeaturedProducts() {
       isFeatured: products.isFeatured,
       totalStock: sql<number>`SUM(${productVariations.stock})`.mapWith(Number)
     })
-    .from(products)
-    .leftJoin(productVariations, eq(products.id, productVariations.productId))
-    .where(sql`${products.isFeatured} = 1`)
-    .groupBy(products.id);
+      .from(products)
+      .leftJoin(productVariations, eq(products.id, productVariations.productId))
+      .where(sql`${products.isFeatured} = 1`)
+      .groupBy(products.id);
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
@@ -36,10 +36,10 @@ async function getFeaturedProducts() {
 async function getHomeSections() {
   try {
     const sections = await db.select().from(pageSections).orderBy(pageSections.displayOrder);
-    
+
     const sectionsWithProducts = await Promise.all(sections.map(async (section) => {
       const productIds = section.productIds.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id));
-      
+
       if (productIds.length === 0) return { ...section, products: [] };
 
       const sectionProducts = await db.select({
@@ -51,8 +51,8 @@ async function getHomeSections() {
         images: products.images,
         category: products.category,
       })
-      .from(products)
-      .where(inArray(products.id, productIds));
+        .from(products)
+        .where(inArray(products.id, productIds));
 
       return {
         ...section,
@@ -97,14 +97,48 @@ export default async function Home() {
   const banners = await getHomeBanners();
   const tabs = await getHomeTabs();
 
+  // Define desired section order matching user request
+  const desiredOrder = [
+    "Dry Fruits",
+    "Spices",
+    "Seeds",
+    "NutSpiceCo Combos",
+    "Millets",
+    "Berries",
+    "A2 Ghee",
+    "Honey",
+  ];
+
+  const orderMap = new Map<string, number>();
+  desiredOrder.forEach((title, index) => {
+    orderMap.set(title.toLowerCase(), index);
+  });
+  // Handle typo "Breeies" mapping to "Berries" index
+  orderMap.set("breeies", orderMap.get("berries")!);
+
+  const sortedHomeSections = [...homeSections].sort((a, b) => {
+    const titleA = a.title.toLowerCase();
+    const titleB = b.title.toLowerCase();
+
+    const indexA = orderMap.has(titleA) ? orderMap.get(titleA)! : Infinity;
+    const indexB = orderMap.has(titleB) ? orderMap.get(titleB)! : Infinity;
+
+    if (indexA !== indexB) {
+      return indexA - indexB;
+    }
+
+    // Fallback to database displayOrder and ID
+    return (a.displayOrder - b.displayOrder) || (a.id - b.id);
+  });
+
   return (
     <div className="min-h-screen bg-white text-brand font-sans selection:bg-brand-accent/30">
       {/* Hero Section */}
       <header className="relative w-full min-h-[85vh] flex flex-col items-center justify-center overflow-hidden border-b border-brand/10 bg-black pt-16">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/images/hero_bg_v2.png" 
-            alt="Premium Dry Fruits" 
+          <img
+            src="/images/hero_bg_v2.png"
+            alt="Premium Dry Fruits"
             className="w-full h-full object-cover opacity-60 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/80"></div>
@@ -124,8 +158,8 @@ export default async function Home() {
           </p>
           <MarketplaceTrustBar />
         </div>
-        
-        <Link 
+
+        <Link
           href="#featured-harvest"
           className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 text-white/40 hover:text-[#C5A059] transition-colors cursor-pointer outline-none"
         >
@@ -155,7 +189,7 @@ export default async function Home() {
         </div>
 
         {/* Dynamic Sections (Grids) */}
-        {homeSections.map((section) => (
+        {sortedHomeSections.map((section) => (
           section.products.length > 0 && (
             <div key={section.id} id={section.title.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-28">
               <ProductGrid title={section.title} initialProducts={section.products as any} />
