@@ -5,24 +5,21 @@ export default function MarketplaceTrustBar() {
   const marketplaces = [
     {
       name: "Amazon",
-      url: "#",
       logo: "/logos/amazon.svg",
       width: 100,
       height: 30,
     },
     {
       name: "Flipkart",
-      url: "#",
       logo: "/logos/flipkart.svg",
       width: 110,
       height: 28,
     },
     {
       name: "Meesho",
-      url: "#",
       logo: "/logos/meesho.svg",
-      width: 104,
-      height: 24,
+      width: 100,
+      height: 22,
     },
   ];
 
@@ -34,11 +31,9 @@ export default function MarketplaceTrustBar() {
       <div className="hidden sm:block h-5 w-px bg-white/20" />
       <div className="flex items-center gap-4 sm:gap-6">
         {marketplaces.map((item) => (
-          <Link
+          <span
             key={item.name}
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
+
             className="group flex items-center justify-center bg-white/90 hover:bg-white px-4 py-1.5 rounded-lg sm:rounded-full transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105 outline-none focus-visible:ring-2 focus-visible:ring-[#C5A059]"
           >
             <Image
@@ -49,7 +44,7 @@ export default function MarketplaceTrustBar() {
               className="opacity-90 transition-opacity duration-300 group-hover:opacity-100 object-contain h-5 w-auto"
               priority
             />
-          </Link>
+          </span>
         ))}
       </div>
     </div>
