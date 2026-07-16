@@ -1,7 +1,7 @@
 // Homepage - Server Component for maximum performance
 import Link from "next/link";
 import Image from "next/image";
-import { Sparkles, ChevronDown } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import ProductGrid from "@/components/ProductGrid";
 import BannerCarousel from "@/components/BannerCarousel";
 import HomeTabs from "@/components/HomeTabs";
@@ -158,16 +158,6 @@ export default async function Home() {
           </p>
           <MarketplaceTrustBar />
         </div>
-
-        <Link
-          href="#featured-harvest"
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 text-white/40 hover:text-[#C5A059] transition-colors cursor-pointer outline-none"
-        >
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em]">Scroll</span>
-            <ChevronDown size={24} />
-          </div>
-        </Link>
       </header>
 
       {/* Banner Carousel */}

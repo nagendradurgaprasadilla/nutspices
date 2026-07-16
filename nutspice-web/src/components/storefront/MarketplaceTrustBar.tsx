@@ -5,24 +5,24 @@ export default function MarketplaceTrustBar() {
   const marketplaces = [
     {
       name: "Amazon",
-      url: "https://www.amazon.in",
+      url: "#",
       logo: "/logos/amazon.svg",
       width: 100,
       height: 30,
     },
     {
       name: "Flipkart",
-      url: "https://www.flipkart.com",
+      url: "#",
       logo: "/logos/flipkart.svg",
       width: 110,
       height: 28,
     },
     {
       name: "Meesho",
-      url: "https://www.meesho.com",
+      url: "#",
       logo: "/logos/meesho.svg",
-      width: 100,
-      height: 26,
+      width: 104,
+      height: 24,
     },
   ];
 
