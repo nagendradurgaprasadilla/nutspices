@@ -42,9 +42,13 @@ export default async function CategoryPage({ params }: PageProps) {
 
         let hydratedProducts: any[] = [];
         if (productIds.length > 0) {
-          hydratedProducts = await db.select()
+          const unsortedProducts = await db.select()
             .from(products)
             .where(inArray(products.id, productIds));
+          // Sort products in the exact order of productIds
+          hydratedProducts = productIds
+            .map(id => unsortedProducts.find(p => p.id === id))
+            .filter((p): p is any => !!p);
         }
 
         return {
@@ -72,9 +76,13 @@ export default async function CategoryPage({ params }: PageProps) {
 
           let hydratedProducts: any[] = [];
           if (productIds.length > 0) {
-            hydratedProducts = await db.select()
+            const unsortedProducts = await db.select()
               .from(products)
               .where(inArray(products.id, productIds));
+            // Sort products in the exact order of productIds
+            hydratedProducts = productIds
+              .map(id => unsortedProducts.find(p => p.id === id))
+              .filter((p): p is any => !!p);
           }
 
           return {

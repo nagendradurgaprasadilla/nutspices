@@ -30,6 +30,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
+  rectSortingStrategy,
   useSortable
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -59,6 +60,63 @@ interface NavItem {
   label: string;
 }
 
+function SortableProductChip({ 
+  product, 
+  onRemove 
+}: { 
+  product: Product; 
+  onRemove: (id: number) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`flex items-center space-x-2 bg-brand/5 border ${isDragging ? 'border-[#C5A059] shadow-md scale-105' : 'border-brand/10'} rounded-xl pl-2 pr-3 py-2 group/pill hover:border-[#C5A059]/30 transition-all`}
+    >
+      <button 
+        type="button"
+        {...attributes} 
+        {...listeners} 
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          listeners?.onPointerDown?.(e);
+        }}
+        className="cursor-grab active:cursor-grabbing text-brand/20 hover:text-[#C5A059] transition-colors p-0.5 -ml-1 mr-0.5"
+      >
+        <GripVertical size={12} />
+      </button>
+      <div className="w-6 h-6 rounded-lg overflow-hidden bg-white border border-brand/5 pointer-events-none">
+        <img 
+          src={(() => {
+            try {
+              const imgs = JSON.parse(product.images || "[]");
+              return imgs[0] || "/images/placeholder.png";
+            } catch { return "/images/placeholder.png"; }
+          })()} 
+          alt={product.name} 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+      <span className="text-[10px] font-bold text-brand uppercase tracking-tight select-none">{product.name}</span>
+      <button 
+        type="button"
+        onClick={() => onRemove(product.id)}
+        className="p-1 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors text-brand/20"
+      >
+        <X size={12} />
+      </button>
+    </div>
+  );
+}
+
 function SortableSectionItem({ 
   section, 
   allProducts,
@@ -79,7 +137,10 @@ function SortableSectionItem({
     ? section.productIds.split(",").map(id => parseInt(id.trim())).filter(id => !isNaN(id))
     : [];
 
-  const selectedProducts = allProducts.filter(p => productIdsArray.includes(p.id));
+  // Sort selectedProducts in the order they are present in productIdsArray
+  const selectedProducts = productIdsArray
+    .map(id => allProducts.find(p => p.id === id))
+    .filter((p): p is Product => !!p);
 
   const style = { 
     transform: CSS.Transform.toString(transform), 
@@ -87,6 +148,11 @@ function SortableSectionItem({
     zIndex: isDragging ? 50 : undefined,
     position: 'relative' as const,
   };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const handleConfirmSelection = (selectedIds: number[]) => {
     onUpdate(section.id, { productIds: selectedIds.join(",") });
@@ -96,6 +162,18 @@ function SortableSectionItem({
   const removeProduct = (id: number) => {
     const newIds = productIdsArray.filter(i => i !== id);
     onUpdate(section.id, { productIds: newIds.join(",") });
+  };
+
+  const handleDragEndProducts = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = productIdsArray.indexOf(active.id as number);
+      const newIndex = productIdsArray.indexOf(over.id as number);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newIds = arrayMove(productIdsArray, oldIndex, newIndex);
+        onUpdate(section.id, { productIds: newIds.join(",") });
+      }
+    }
   };
 
   return (
@@ -135,44 +213,29 @@ function SortableSectionItem({
         <div>
           <label className="block text-[10px] font-black text-brand/40 uppercase tracking-[0.2em] mb-4">Display Products (IDS)</label>
           
-          <div className="flex flex-wrap gap-3 mb-6">
-            {selectedProducts.map((product) => (
-              <div 
-                key={product.id}
-                className="flex items-center space-x-2 bg-brand/5 border border-brand/10 rounded-xl pl-2 pr-3 py-2 group/pill hover:border-[#C5A059]/30 transition-all"
-              >
-                <div className="w-6 h-6 rounded-lg overflow-hidden bg-white border border-brand/5">
-                  <img 
-                    src={(() => {
-                      try {
-                        const imgs = JSON.parse(product.images || "[]");
-                        return imgs[0] || "/images/placeholder.png";
-                      } catch { return "/images/placeholder.png"; }
-                    })()} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover" 
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndProducts}>
+            <SortableContext items={productIdsArray} strategy={rectSortingStrategy}>
+              <div className="flex flex-wrap gap-3 mb-6">
+                {selectedProducts.map((product) => (
+                  <SortableProductChip 
+                    key={product.id}
+                    product={product}
+                    onRemove={removeProduct}
                   />
-                </div>
-                <span className="text-[10px] font-bold text-brand uppercase tracking-tight">{product.name}</span>
+                ))}
+                
                 <button 
-                  onClick={() => removeProduct(product.id)}
-                  className="p-1 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors text-brand/20"
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex items-center space-x-2 bg-[#1B3022] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-[#2c4d37] transition-all shadow-sm"
                 >
-                  <X size={12} />
+                  <Plus size={14} />
+                  <span>Add Products</span>
                 </button>
               </div>
-            ))}
-            
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center space-x-2 bg-[#1B3022] text-white px-4 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-[#2c4d37] transition-all shadow-sm"
-            >
-              <Plus size={14} />
-              <span>Add Products</span>
-            </button>
-          </div>
+            </SortableContext>
+          </DndContext>
           
-          <p className="text-[10px] text-brand/30 font-medium">Use the product selector to add items to this carousel. They will appear on the site in the order you select them.</p>
+          <p className="text-[10px] text-brand/30 font-medium">Use the product selector to add items to this carousel. Drag the handles (<GripVertical className="inline" size={10} />) to reorder them.</p>
         </div>
       </div>
 

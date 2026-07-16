@@ -42,7 +42,7 @@ async function getHomeSections() {
 
       if (productIds.length === 0) return { ...section, products: [] };
 
-      const sectionProducts = await db.select({
+      const unsortedProducts = await db.select({
         id: products.id,
         name: products.name,
         description: products.description,
@@ -54,9 +54,14 @@ async function getHomeSections() {
         .from(products)
         .where(inArray(products.id, productIds));
 
+      // Sort products in the exact order of productIds
+      const sortedProducts = productIds
+        .map(id => unsortedProducts.find(p => p.id === id))
+        .filter((p): p is any => !!p);
+
       return {
         ...section,
-        products: sectionProducts
+        products: sortedProducts
       };
     }));
 
