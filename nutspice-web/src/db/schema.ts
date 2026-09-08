@@ -22,6 +22,7 @@ export const otpVerifications = sqliteTable("otp_verifications", {
 export const products = sqliteTable("products", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
+  slug: text("slug").unique(),
   description: text("description"),
   basePrice: real("base_price").notNull(),
   salePrice: real("sale_price"),

@@ -8,6 +8,7 @@ export async function GET() {
     const results = await db.select({
       id: products.id,
       name: products.name,
+      slug: products.slug,
       description: products.description,
       basePrice: products.basePrice,
       salePrice: products.salePrice,

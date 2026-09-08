@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { Sparkles, ArrowLeft, ShoppingBag, Check, X, Minus, Plus } from "lucide-react";
+import { Sparkles, ArrowLeft, ShoppingBag, Check, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
@@ -17,6 +17,7 @@ interface Variation {
 
 interface Product {
   id: number;
+  slug?: string;
   name: string;
   description: string;
   basePrice: number;
@@ -27,9 +28,9 @@ interface Product {
   enabledMeasurements?: string | null;
 }
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
-  const { id } = use(params);
+  const { slug } = use(params);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -45,13 +46,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     window.scrollTo(0, 0);
     async function fetchProduct() {
       try {
-        const res = await fetch(`/api/products/${id}`);
+        const res = await fetch(`/api/products/slug/${encodeURIComponent(slug)}`);
         if (res.ok) {
-          const data = await res.json();
+          const data: Product = await res.json();
           setProduct(data);
 
+          // If accessed via numeric ID, seamlessly update URL to canonical slug
+          if (data.slug && data.slug !== slug) {
+            window.history.replaceState(null, "", `/product/${data.slug}`);
+          }
+
           // Set initial size to the first available variation
-          if (data.variations.length > 0) {
+          if (data.variations && data.variations.length > 0) {
             const firstAvailable = data.variations.find((v: any) => v.stock > 0);
             if (firstAvailable) {
               setSelectedSize(firstAvailable.size);
@@ -65,12 +71,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           if (images.length > 0) {
             setMainImage(images[0]);
           }
+
           // Fetch related products
           try {
             const resFeatured = await fetch('/api/products/featured');
             if (resFeatured.ok) {
               const featuredData = await resFeatured.json();
-              setRelatedProducts(featuredData.data.filter((p: any) => p.id.toString() !== id));
+              setRelatedProducts(featuredData.data.filter((p: any) => p.id.toString() !== data.id.toString()));
             }
           } catch (e) {
             console.error("Failed to fetch related products", e);
@@ -83,7 +90,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       }
     }
     fetchProduct();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -120,8 +127,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const currentStock = currentVariation?.stock || 0;
   const existingCartItem = cartItems.find(item => item.id === `prod_${product.id}_${selectedSize}`);
   const remainingStock = currentStock - (existingCartItem?.quantity || 0);
-
-  const enabledMeasurementsList = JSON.parse(product.enabledMeasurements || "[]") as string[];
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -230,7 +235,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               {product.description}
             </p>
 
-
             {/* Weight Selector */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
@@ -264,7 +268,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 })}
               </div>
             </div>
-
 
             {/* Quantity & Add to Cart */}
             <div className="mb-4 pt-6 border-t border-brand/5">
@@ -332,6 +335,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 const productProp = {
                   id: p.id.toString(),
+                  slug: p.slug,
                   name: p.name,
                   description: p.description,
                   price: p.salePrice || p.basePrice,
@@ -357,6 +361,5 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         )}
       </main>
     </div>
-
   );
 }

@@ -75,6 +75,7 @@ export default function ProductCarousel({ title, products }: ProductCarouselProp
               <ProductCard 
                 product={{
                   id: product.id.toString(),
+                  slug: product.slug,
                   name: product.name,
                   description: product.description || "",
                   price: product.salePrice || product.basePrice || 0,

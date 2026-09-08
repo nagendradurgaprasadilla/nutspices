@@ -81,6 +81,7 @@ export default function ProductGrid({ initialProducts, title = "NutspiceCo Speci
                 <ProductCard
                   product={{
                     id: product.id.toString(),
+                    slug: product.slug,
                     name: product.name,
                     description: product.description || "",
                     price: product.salePrice || product.basePrice,

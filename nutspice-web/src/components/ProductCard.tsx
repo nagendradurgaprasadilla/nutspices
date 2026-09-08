@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 interface Product {
   id: string;
+  slug?: string;
   name: string;
   description: string;
   price: number;
@@ -14,6 +15,7 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const mrp = product.mrp || Math.round(product.price * 1.2);
   const discount = Math.round(((mrp - product.price) / mrp) * 100);
+  const productLink = `/product/${product.slug || product.id}`;
 
   return (
     <div className="group flex flex-col h-full w-full bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -27,7 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
 
-        <Link href={`/product/${product.id}`} className="block w-full h-full">
+        <Link href={productLink} className="block w-full h-full">
           <img
             src={product.imageUrl || "/images/placeholder.png"}
             alt={product.name}
@@ -38,7 +40,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Content Area */}
       <div className="px-4 pb-4 pt-1 flex flex-col flex-1 text-center">
-        <Link href={`/product/${product.id}`} className="block mb-2">
+        <Link href={productLink} className="block mb-2">
           <h3 className="text-[14px] font-bold text-gray-900 line-clamp-2 leading-snug hover:text-[#005B41] transition-colors">
             {product.name}
           </h3>
@@ -58,7 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Action Button */}
         <Link
-          href={`/product/${product.id}`}
+          href={productLink}
           className="w-full bg-[#005B41] hover:bg-[#004230] text-white text-sm font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center shadow-sm"
         >
           View Details

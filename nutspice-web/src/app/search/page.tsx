@@ -109,6 +109,7 @@ function SearchResults() {
                 key={product.id} 
                 product={{
                   id: product.id.toString(),
+                  slug: product.slug,
                   name: product.name,
                   description: product.description || "",
                   price: product.salePrice || product.basePrice,

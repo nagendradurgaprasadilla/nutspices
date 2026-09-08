@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { isAdminNumber } from "@/lib/admin";
 
+import { generateUniqueSlug, slugify } from "@/lib/slugify";
+
 async function isAdmin() {
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session")?.value;
@@ -115,12 +117,19 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { 
-      name, description, images, variations,
+      name, slug, description, images, variations,
       category, tags, isFeatured
     } = body;
 
     // Validation
     if (!name) return NextResponse.json({ success: false, error: "Product name is required" }, { status: 400 });
+
+    let finalSlug = slug ? slugify(slug) : "";
+    if (!finalSlug) {
+      const existingProducts = await db.select({ slug: products.slug }).from(products);
+      const usedSlugs = new Set(existingProducts.map(p => p.slug).filter(Boolean) as string[]);
+      finalSlug = generateUniqueSlug(name, usedSlugs);
+    }
     
     // Pricing is now handled per variation. 
     // We will calculate a "base price" for the main product entry from the minimum variation price.
@@ -131,6 +140,7 @@ export async function POST(request: Request) {
     const newProduct = await db.transaction(async (tx) => {
       const insertValues = {
         name,
+        slug: finalSlug,
         description: description || null,
         basePrice: basePriceValue,
         salePrice: baseSalePrice,
@@ -183,7 +193,7 @@ export async function PATCH(request: Request) {
   try {
     const body = await request.json();
     const { 
-      id, name, description, images, variations,
+      id, name, slug, description, images, variations,
       category, tags, isFeatured
     } = body;
     if (!id) return NextResponse.json({ success: false, error: "ID is required" }, { status: 400 });
@@ -198,6 +208,7 @@ export async function PATCH(request: Request) {
 
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
+    if (slug !== undefined) updateData.slug = slugify(slug);
     if (description !== undefined) updateData.description = description;
     if (variations) {
       updateData.basePrice = basePriceValue;

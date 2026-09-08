@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 type Product = {
   id: number;
+  slug: string | null;
   name: string;
   category: string | null;
   gender: string | null;
@@ -117,7 +118,7 @@ export default function SearchModal({ isOpen, onClose }: { isOpen: boolean; onCl
                 return (
                   <Link
                     key={product.id}
-                    href={`/product/${product.id}`}
+                    href={`/product/${product.slug || product.id}`}
                     onClick={onClose}
                     className="group bg-brand/5 rounded-2xl overflow-hidden hover:bg-brand/10 transition-colors flex flex-col border border-brand/5"
                   >

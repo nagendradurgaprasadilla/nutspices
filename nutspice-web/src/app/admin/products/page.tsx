@@ -6,7 +6,7 @@ const DEFAULT_SIZES = ["100g", "200g", "250g", "500g", "1kg", "2kg", "5kg"];
 
 interface Variation { size: string; stock: number; sku: string; basePrice: number; salePrice: number; }
 interface Product {
-  id: number; name: string; description: string | null;
+  id: number; name: string; slug: string | null; description: string | null;
   basePrice: number; salePrice: number; images: string;
   category: string | null;
   totalStock: number;
@@ -30,6 +30,7 @@ export default function ProductManagement() {
 
   // ── Form state ──────────────────────────────────────────────
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   // Removed overall mrp and salePrice
@@ -105,7 +106,7 @@ export default function ProductManagement() {
 
   const resetForm = () => {
     setEditingId(null);
-    setName(""); setDescription(""); setCategory("");
+    setName(""); setSlug(""); setDescription(""); setCategory("");
     setIsFeatured(false); setTags(""); setImages([]);
     setSelectedSizes([]); setVariations([]); setCustomSizeInput("");
   };
@@ -119,6 +120,7 @@ export default function ProductManagement() {
         const p = data.data;
         setEditingId(p.id);
         setName(p.name);
+        setSlug(p.slug || "");
         setDescription(p.description || "");
         setCategory(p.category || "");
         // mrp and salePrice are now in variations
@@ -154,7 +156,7 @@ export default function ProductManagement() {
     try {
       const method = editingId ? "PATCH" : "POST";
       const payload = { 
-        id: editingId, name, description, images, variations, 
+        id: editingId, name, slug, description, images, variations, 
         category, tags, isFeatured,
       };
       
@@ -357,6 +359,10 @@ export default function ProductManagement() {
                 <div>
                   <label className={LABEL}>Product Name *</label>
                   <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Premium Roasted Almonds" className={INPUT} required />
+                </div>
+                <div>
+                  <label className={LABEL}>URL Slug (custom URL path)</label>
+                  <input value={slug} onChange={e => setSlug(e.target.value)} placeholder="e.g. premium-roasted-almonds (auto-generated if empty)" className={INPUT} />
                 </div>
                 <div>
                   <label className={LABEL}>Description</label>

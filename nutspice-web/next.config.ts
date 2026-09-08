@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   experimental: {
     scrollRestoration: true,
   },
-  allowedDevOrigins: ['localhost', '127.0.0.1']
+  allowedDevOrigins: ['localhost', '127.0.0.1', '192.168.1.16', 'blandness-drown-shrank.ngrok-free.dev']
 };
 
 export default nextConfig;
