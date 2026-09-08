@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ShieldCheck, User, Phone, Loader2 } from "lucide-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
@@ -17,9 +17,10 @@ declare global {
   }
 }
 
-
-export default function Login() {
+function LoginFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl") || searchParams.get("redirect") || "/";
   const [step, setStep] = useState<"phone" | "otp" | "profile">("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -172,7 +173,7 @@ export default function Login() {
         if (data.isNewUser) {
           setStep("profile");
         } else {
-          router.push("/");
+          router.push(returnUrl);
           router.refresh();
         }
       } else {
@@ -205,7 +206,7 @@ export default function Login() {
       const data = await res.json();
       
       if (data.success) {
-        router.push("/");
+        router.push(returnUrl);
         router.refresh();
       } else {
         setError(data.error || "Failed to save profile");
@@ -399,6 +400,18 @@ export default function Login() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen w-full flex items-center justify-center bg-white">
+        <Loader2 className="w-8 h-8 text-[#C5A059] animate-spin" />
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   );
 }
 

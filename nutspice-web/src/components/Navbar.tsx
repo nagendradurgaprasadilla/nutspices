@@ -84,10 +84,6 @@ export default function Navbar() {
           setUser(sessionData.user);
         } else {
           setUser(null);
-          // If the user is logged out, ensure the cart is empty
-          if (cartItems.length > 0) {
-            clearCart();
-          }
         }
 
         // Fetch Collections (Carousel Names) - For all users
@@ -252,7 +248,7 @@ export default function Navbar() {
                 <span className="text-[10px] font-black tracking-wider hidden lg:block">B2B</span>
               </Link>
 
-              <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="hover:text-[#C5A059] transition-colors relative p-2">
+              <Link href="/cart" aria-label="Cart" className="hover:text-[#C5A059] transition-colors relative p-2">
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute top-0 right-0 bg-[#C5A059] text-white text-[8px] font-black h-3.5 w-3.5 rounded-full flex items-center justify-center border-2 border-brand">
                   {cartCount}
@@ -286,7 +282,7 @@ export default function Navbar() {
               <Link href="/b2b" aria-label="B2B" className="text-white p-2">
                 <Briefcase className="h-5 w-5" />
               </Link>
-              <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="text-white relative p-2">
+              <Link href="/cart" aria-label="Cart" className="text-white relative p-2">
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute top-0 right-0 bg-[#C5A059] text-white text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-brand">
                   {cartCount}

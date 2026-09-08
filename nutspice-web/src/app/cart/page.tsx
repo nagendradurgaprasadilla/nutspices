@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, CreditCard, ShieldCheck, CheckCircle2, Scissors, Sparkles, MapPin, AlertTriangle, Truck, Star, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PincodeEstimatorModal from "@/components/PincodeEstimatorModal";
+import GuestCheckoutModal from "@/components/GuestCheckoutModal";
 
 const PACKAGE_DIMENSIONS: Record<number, { L: number; B: number; H: number }> = {
   0.5 : { L: 10, B: 10, H: 10 },
@@ -89,6 +90,7 @@ export default function CartPage() {
   const [selectedRateId, setSelectedRateId] = useState("");
   const [shippingError, setShippingError] = useState<string | null>(null);
   const [isPincodeModalOpen, setIsPincodeModalOpen] = useState(false);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
 
   const totalWeight = calculateTotalWeight(items);
   const dimensions = getDimensionsForWeight(totalWeight);
@@ -344,6 +346,19 @@ export default function CartPage() {
   const total = subtotal + shipping;
 
   const handleCheckout = async () => {
+    try {
+      const sessionRes = await fetch("/api/auth/session");
+      const sessionData = await sessionRes.json();
+      if (!sessionData.authenticated) {
+        setIsGuestModalOpen(true);
+        return;
+      }
+    } catch (e) {
+      console.error("Session verification failed", e);
+      setIsGuestModalOpen(true);
+      return;
+    }
+
     setIsCheckoutModalOpen(true);
     setPaymentStep("address");
     
@@ -896,6 +911,11 @@ export default function CartPage() {
         isOpen={isPincodeModalOpen}
         onClose={() => setIsPincodeModalOpen(false)}
         onSubmit={handlePincodeSubmit}
+      />
+
+      <GuestCheckoutModal
+        isOpen={isGuestModalOpen}
+        onClose={() => setIsGuestModalOpen(false)}
       />
     </div>
   );

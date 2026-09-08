@@ -34,11 +34,6 @@ export default function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Protect Product and Cart Routes 
-  if ((pathname.startsWith('/product/') || pathname.startsWith('/cart')) && !session) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
   return NextResponse.next()
 }
 
