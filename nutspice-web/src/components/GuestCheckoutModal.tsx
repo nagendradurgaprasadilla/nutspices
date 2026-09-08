@@ -16,7 +16,7 @@ export default function GuestCheckoutModal({ isOpen, onClose }: GuestCheckoutMod
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-dark/40 backdrop-blur-md animate-in fade-in duration-300">
       <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative overflow-hidden text-center">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full text-brand/40 hover:text-brand hover:bg-brand/5 transition-all cursor-pointer"
         >
@@ -40,13 +40,13 @@ export default function GuestCheckoutModal({ isOpen, onClose }: GuestCheckoutMod
             <span>Login / Register</span>
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
-          
-          <button
+
+          {/* <button
             onClick={onClose}
             className="w-full bg-brand/5 text-brand/70 py-3 rounded-xl font-bold tracking-widest uppercase text-[10px] hover:bg-brand/10 transition-all cursor-pointer"
           >
             Continue Browsing
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
